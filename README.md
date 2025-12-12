@@ -4,6 +4,8 @@ simple user management, create, verify, login - v2
 
 
 .
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/8a36e6c1-c1f9-4044-9a36-5773cc3220c8" />
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/6acdeab9-050a-4a3a-9759-2c1c0bf30033" />
+
 .
-<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/278e708c-e7d3-4238-9d66-8385adc42851" />
+<img width="1600" height="900" alt="image" src="https://github.com/user-attachments/assets/f5f19870-76c5-4c26-9d31-9e8f898c92f0" />
+
