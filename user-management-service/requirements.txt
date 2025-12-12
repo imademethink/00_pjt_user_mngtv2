@@ -1,0 +1,5 @@
+Flask
+# A library for creating secure, URL-safe tokens for confirmation links
+itsdangerous
+# A package for handling environment variables/configuration
+python-dotenv
