@@ -1,0 +1,8 @@
+Flask
+itsdangerous
+python-dotenv
+# Testing dependencies
+requests
+pytest
+pytest-html
+requests
