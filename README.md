@@ -1,5 +1,4 @@
-# 00_pjt_user_mngtv2
-simple user management, create, verify, login - v2
+**V2 simple user management, user - (CRUD, verify), login/ logout, session key, forget password, registration link retrieve again**
 
 
 
