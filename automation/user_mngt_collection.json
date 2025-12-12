@@ -1,0 +1,108 @@
+{
+	"info": {
+		"_postman_id": "YOUR_POSTMAN_ID_HERE",
+		"name": "User Management System V2 - Full Lifecycle",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://localhost:5000" },
+		{ "key": "test_email", "value": "v2_test_{{$randomInt}}@api.com" },
+		{ "key": "test_password", "value": "123456" },
+		{ "key": "new_password", "value": "654321" },
+		{ "key": "confirmation_link", "value": "" },
+		{ "key": "session_key", "value": "" },
+		{ "key": "user_id", "value": "" }
+	],
+	"item": [
+		{
+			"name": "1. REGISTER (Success & Capture Link)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () { pm.response.to.have.status(201); });",
+							"var jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"confirmation_link\", jsonData.confirmation_link);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": { "method": "POST", "url": "{{baseUrl}}/register", "body": { "mode": "raw", "raw": "{ \"email\": \"{{test_email}}\", \"password\": \"{{test_password}}\" }" } }, "response": []
+		},
+		{
+			"name": "2. CONFIRM REGISTRATION",
+			"event": [
+				{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });" ], "type": "text/javascript" } }
+			],
+			"request": { "method": "GET", "url": "{{confirmation_link}}" }, "response": []
+		},
+		{
+			"name": "3. LOGIN (Capture Session Key)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+							"var jsonData = pm.response.json();",
+							"pm.collectionVariables.set(\"session_key\", jsonData.session_key);",
+							"pm.collectionVariables.set(\"user_id\", jsonData.user_id);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": { "method": "POST", "url": "{{baseUrl}}/login", "body": { "mode": "raw", "raw": "{ \"email\": \"{{test_email}}\", \"password\": \"{{test_password}}\" }" } }, "response": []
+		},
+		{
+			"name": "4. UPDATE USER DETAILS (PUT /user_mngt_user)",
+			"event": [
+				{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });" ], "type": "text/javascript" } }
+			],
+			"request": {
+				"method": "PUT",
+				"url": { "raw": "{{baseUrl}}/user_mngt_user?email={{test_email}}&session_key={{session_key}}", "query": [ { "key": "email", "value": "{{test_email}}" }, { "key": "session_key", "value": "{{session_key}}" } ] },
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"first_name\": \"Alpha\",\n    \"last_name\": \"Beta\",\n    \"address1\": \"123 Main St\",\n    \"address2\": \"Suite 100\",\n    \"city\": \"Atlantis\",\n    \"state\": \"Ocean\",\n    \"country\": \"WAKANDA\",\n    \"pin_code\": \"123456\",\n    \"contact_country_code\": \"001\",\n    \"contact_number\": \"1234567890\"\n}"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. GET USER DETAILS (GET /user_mngt_user)",
+			"event": [
+				{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });" ], "type": "text/javascript" } }
+			],
+			"request": {
+				"method": "GET",
+				"url": { "raw": "{{baseUrl}}/user_mngt_user?email={{test_email}}&session_key={{session_key}}", "query": [ { "key": "email", "value": "{{test_email}}" }, { "key": "session_key", "value": "{{session_key}}" } ] }
+			},
+			"response": []
+		},
+		{
+			"name": "6. LOGOUT",
+			"event": [
+				{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });" ], "type": "text/javascript" } }
+			],
+			"request": { "method": "POST", "url": "{{baseUrl}}/logout", "body": { "mode": "raw", "raw": "{ \"email\": \"{{test_email}}\", \"session_key\": \"{{session_key}}\" }" } }, "response": []
+		},
+		{
+			"name": "7. LOGIN AGAIN (Expected 401 - Session Inactive)",
+			"event": [
+				{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });" ], "type": "text/javascript" } }
+			],
+			"request": { "method": "POST", "url": "{{baseUrl}}/login", "body": { "mode": "raw", "raw": "{ \"email\": \"{{test_email}}\", \"password\": \"{{test_password}}\" }" } }, "response": []
+		},
+		{
+			"name": "8. DELETE USER (Needs new login to get active session)",
+			"event": [
+				{ "listen": "prerequest", "script": { "exec": [ "// Re-login to get a new session key for deletion", "pm.sendRequest({\n    url: '{{baseUrl}}/login',\n    method: 'POST',\n    header: 'Content-Type:application/json',\n    body: {\n        mode: 'raw',\n        raw: JSON.stringify({\n            \"email\": pm.collectionVariables.get(\"test_email\"),\n            \"password\": pm.collectionVariables.get(\"test_password\")\n        })\n    }\n}, function (err, res) {\n    if (err) {\n        console.log(err);\n    } else {\n        var jsonData = res.json();\n        pm.collectionVariables.set(\"session_key\", jsonData.session_key);\n    }\n});" ], "type": "text/javascript" } },
+				{ "listen": "test", "script": { "exec": [ "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });" ], "type": "text/javascript" } }
+			],
+			"request": { "method": "DELETE", "url": "{{baseUrl}}/user_mngt_user", "body": { "mode": "raw", "raw": "{ \"email\": \"{{test_email}}\", \"password\": \"{{test_password}}\", \"session_key\": \"{{session_key}}\" }" } }, "response": []
+		}
+	]
+}
